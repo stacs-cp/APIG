@@ -28,7 +28,7 @@
   "gradedTypes": "both",
   "nEvaluations": 1,
   "solver": "chuffed",
-  "SRTimelimit": 120,
+  "SRTimelimit": 300,
   "SRFlags": "",
   "solverMinTime": 10,
   "solverTimelimit": 1200,
