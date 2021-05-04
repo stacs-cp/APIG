@@ -74,5 +74,7 @@ such that n_courses <= n_periods * courses_per_period_ub
 such that |prerequisite| > 0
 such that and([a != b | (a, b) <- toSet(prerequisite)])
 
-find level : function (total) int(1..n_courses_max) --> int(1..3) 
-such that forAll (a,b) in toSet(prerequisite) . level(a) < level(b)
+find level : function int(1..n_courses_max) --> int(1..3) 
+such that 
+    and([q>=1 /\ q<=n_courses <-> q in defined(level) | q : int(1..n_courses_max)]),
+    forAll (a,b) in toSet(prerequisite) . level(a) < level(b)
