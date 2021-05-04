@@ -26,12 +26,12 @@
  "minizinc-version": "",
  "evaluationSettings": {
   "gradedTypes": "both",
-  "nEvaluations": 3,
+  "nEvaluations": 1,
   "solver": "chuffed",
-  "SRTimelimit": 30,
+  "SRTimelimit": 120,
   "SRFlags": "",
-  "solverMinTime": 3,
-  "solverTimelimit": 10,
+  "solverMinTime": 10,
+  "solverTimelimit": 1200,
   "solverFlags": "-f"
  }
 }
