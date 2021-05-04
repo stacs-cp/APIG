@@ -1,0 +1,359 @@
+language ESSENCE' 1.0
+
+given n_courses: int(1..)
+given n_periods: int(1..)
+given load_per_period_lb: int(1..)
+given load_per_period_ub: int(1..)
+given courses_per_period_lb: int(1..)
+given courses_per_period_ub: int(1..)
+given fin1: int
+given prerequisite_RelationAsSet_Explicit_1: matrix indexed by [int(1..fin1)] of int(1..n_courses)
+given prerequisite_RelationAsSet_Explicit_2: matrix indexed by [int(1..fin1)] of int(1..n_courses)
+given fin2: int
+given fin3: int
+given course_load_Function1D: matrix indexed by [int(1..n_courses)] of int(1..fin3)
+where load_per_period_lb < load_per_period_ub
+where courses_per_period_lb < courses_per_period_ub
+where and([course_load_Function1D[course] <= load_per_period_ub | course : int(1..n_courses)])
+where
+    and([sum([course_load_Function1D[c] | c : int(1..n_courses)]) >= n_periods * load_per_period_lb
+             | course : int(1..n_courses)])
+where
+    and([sum([course_load_Function1D[c] | c : int(1..n_courses)]) <= n_periods * load_per_period_ub
+             | course : int(1..n_courses)])
+where n_courses >= n_periods * courses_per_period_lb
+where n_courses <= n_periods * courses_per_period_ub
+where fin1 > 0
+where
+    and([prerequisite_RelationAsSet_Explicit_1[q16] != prerequisite_RelationAsSet_Explicit_2[q16] | q16 : int(1..fin1)])
+given fin4: int
+given level_Function1D: matrix indexed by [int(1..n_courses)] of int(1..3)
+where
+    and([level_Function1D[prerequisite_RelationAsSet_Explicit_1[q13]] <
+         level_Function1D[prerequisite_RelationAsSet_Explicit_2[q13]]
+             | q13 : int(1..fin1)])
+find curr_Function1D: matrix indexed by [int(1..n_courses)] of int(1..n_periods)
+branching on [curr_Function1D]
+such that
+    and([table([c1, c2; int(1..2)],
+               [[prerequisite_RelationAsSet_Explicit_1[q14], prerequisite_RelationAsSet_Explicit_2[q14]; int(1..2)]
+                    | q14 : int(1..fin1)])
+         -> curr_Function1D[c1] < curr_Function1D[c2]
+             | c1 : int(1..n_courses), c2 : int(1..n_courses)]),
+    and([sum([toInt(curr_Function1D[q3] = p) * catchUndef(course_load_Function1D[q3], 0) | q3 : int(1..n_courses)]) <=
+         load_per_period_ub
+         /\
+         sum([toInt(curr_Function1D[q5] = p) * catchUndef(course_load_Function1D[q5], 0) | q5 : int(1..n_courses)]) >=
+         load_per_period_lb
+             | p : int(1..n_periods)]),
+    and([sum([toInt(curr_Function1D[q8] = p) | q8 : int(1..n_courses)]) <= courses_per_period_ub /\
+         sum([toInt(curr_Function1D[q11] = p) | q11 : int(1..n_courses)]) >= courses_per_period_lb
+             | p : int(1..n_periods)])
+
+$ Conjure's
+$ {"finds": [{"Name": "curr"}],
+$  "givens":
+$      [{"Name": "n_courses"}, {"Name": "n_periods"}, {"Name": "load_per_period_lb"}, {"Name": "load_per_period_ub"},
+$       {"Name": "courses_per_period_lb"}, {"Name": "courses_per_period_ub"}, {"Name": "prerequisite"},
+$       {"Name": "course_load"}, {"Name": "level"}],
+$  "enumGivens": [], "enumLettings": [],
+$  "lettings":
+$      [[{"Name": "Course"},
+$        {"Domain":
+$             {"DomainInt":
+$                  [{"TagInt": []},
+$                   [{"RangeBounded":
+$                         [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                          {"Reference":
+$                               [{"Name": "n_courses"},
+$                                {"DeclNoRepr":
+$                                     ["Given", {"Name": "n_courses"},
+$                                      {"DomainInt":
+$                                           [{"TagInt": []},
+$                                            [{"RangeLowerBounded":
+$                                                  {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]},
+$                                      {"NoRegion": []}]}]}]}]]}}],
+$       [{"Name": "Period"},
+$        {"Domain":
+$             {"DomainInt":
+$                  [{"TagInt": []},
+$                   [{"RangeBounded":
+$                         [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                          {"Reference":
+$                               [{"Name": "n_periods"},
+$                                {"DeclNoRepr":
+$                                     ["Given", {"Name": "n_periods"},
+$                                      {"DomainInt":
+$                                           [{"TagInt": []},
+$                                            [{"RangeLowerBounded":
+$                                                  {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]},
+$                                      {"NoRegion": []}]}]}]}]]}}]],
+$  "unnameds": [], "strategyQ": {"PickFirst": []}, "strategyA": {"Compact": []},
+$  "trailCompact":
+$      [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]],
+$  "trailVerbose": [], "trailRewrites": [], "nameGenState": [["fin", 5], ["q", 17]], "nbExtraGivens": 4,
+$  "representations":
+$      [[{"MachineName": ["fin", 1, []]}, {"DomainInt": [{"TagInt": []}, []]}],
+$       [{"Name": "n_courses"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"MachineName": ["fin", 2, []]}, {"DomainInt": [{"TagInt": []}, []]}],
+$       [{"MachineName": ["fin", 3, []]}, {"DomainInt": [{"TagInt": []}, []]}],
+$       [{"Name": "load_per_period_lb"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"Name": "load_per_period_ub"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"Name": "courses_per_period_lb"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"Name": "courses_per_period_ub"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"Name": "course_load"},
+$        {"DomainFunction":
+$             [{"Function_1D": []},
+$              [{"SizeAttr_Size":
+$                    {"Reference":
+$                         [{"MachineName": ["fin", 2, []]},
+$                          {"DeclHasRepr":
+$                               ["Given", {"MachineName": ["fin", 2, []]}, {"DomainInt": [{"TagInt": []}, []]}]}]}},
+$               "PartialityAttr_Total", "JectivityAttr_None"],
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Reference":
+$                                [{"Name": "n_courses"},
+$                                 {"DeclHasRepr":
+$                                      ["Given", {"Name": "n_courses"},
+$                                       {"DomainInt":
+$                                            [{"TagInt": []},
+$                                             [{"RangeLowerBounded":
+$                                                   {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}]}]}]}]]},
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Reference":
+$                                [{"MachineName": ["fin", 3, []]},
+$                                 {"DeclHasRepr":
+$                                      ["Given", {"MachineName": ["fin", 3, []]},
+$                                       {"DomainInt": [{"TagInt": []}, []]}]}]}]}]]}]}],
+$       [{"Name": "n_periods"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"Name": "prerequisite"},
+$        {"DomainRelation":
+$             [{"Relation_AsSet": {"Set_Explicit": []}},
+$              [{"SizeAttr_Size":
+$                    {"Reference":
+$                         [{"MachineName": ["fin", 1, []]},
+$                          {"DeclHasRepr":
+$                               ["Given", {"MachineName": ["fin", 1, []]}, {"DomainInt": [{"TagInt": []}, []]}]}]}},
+$               []],
+$              [{"DomainInt":
+$                    [{"TagInt": []},
+$                     [{"RangeBounded":
+$                           [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                            {"Reference":
+$                                 [{"Name": "n_courses"},
+$                                  {"DeclHasRepr":
+$                                       ["Given", {"Name": "n_courses"},
+$                                        {"DomainInt":
+$                                             [{"TagInt": []},
+$                                              [{"RangeLowerBounded":
+$                                                    {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}]}]}]}]]},
+$               {"DomainInt":
+$                    [{"TagInt": []},
+$                     [{"RangeBounded":
+$                           [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                            {"Reference":
+$                                 [{"Name": "n_courses"},
+$                                  {"DeclHasRepr":
+$                                       ["Given", {"Name": "n_courses"},
+$                                        {"DomainInt":
+$                                             [{"TagInt": []},
+$                                              [{"RangeLowerBounded":
+$                                                    {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}]}]}]}]]}]]}],
+$       [{"MachineName": ["fin", 4, []]}, {"DomainInt": [{"TagInt": []}, []]}],
+$       [{"Name": "level"},
+$        {"DomainFunction":
+$             [{"Function_1D": []},
+$              [{"SizeAttr_Size":
+$                    {"Reference":
+$                         [{"MachineName": ["fin", 4, []]},
+$                          {"DeclHasRepr":
+$                               ["Given", {"MachineName": ["fin", 4, []]}, {"DomainInt": [{"TagInt": []}, []]}]}]}},
+$               "PartialityAttr_Total", "JectivityAttr_None"],
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Reference":
+$                                [{"Name": "n_courses"},
+$                                 {"DeclHasRepr":
+$                                      ["Given", {"Name": "n_courses"},
+$                                       {"DomainInt":
+$                                            [{"TagInt": []},
+$                                             [{"RangeLowerBounded":
+$                                                   {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}]}]}]}]]},
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Constant": {"ConstantInt": [{"TagInt": []}, 3]}}]}]]}]}],
+$       [{"Name": "curr"},
+$        {"DomainFunction":
+$             [{"Function_1D": []}, [{"SizeAttr_None": []}, "PartialityAttr_Total", "JectivityAttr_None"],
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Reference":
+$                                [{"Name": "n_courses"},
+$                                 {"DeclHasRepr":
+$                                      ["Given", {"Name": "n_courses"},
+$                                       {"DomainInt":
+$                                            [{"TagInt": []},
+$                                             [{"RangeLowerBounded":
+$                                                   {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}]}]}]}]]},
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Reference":
+$                                [{"Name": "n_periods"},
+$                                 {"DeclHasRepr":
+$                                      ["Given", {"Name": "n_periods"},
+$                                       {"DomainInt":
+$                                            [{"TagInt": []},
+$                                             [{"RangeLowerBounded":
+$                                                   {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}]}]}]}]]}]}]],
+$  "representationsTree":
+$      [[{"Name": "course_load"},
+$        [{"rootLabel": {"Function_1D": []},
+$          "subForest": [{"rootLabel": null, "subForest": []}, {"rootLabel": null, "subForest": []}]}]],
+$       [{"Name": "courses_per_period_lb"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "courses_per_period_ub"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "curr"},
+$        [{"rootLabel": {"Function_1D": []},
+$          "subForest": [{"rootLabel": null, "subForest": []}, {"rootLabel": null, "subForest": []}]}]],
+$       [{"MachineName": ["fin", 1, []]}, [{"rootLabel": null, "subForest": []}]],
+$       [{"MachineName": ["fin", 2, []]}, [{"rootLabel": null, "subForest": []}]],
+$       [{"MachineName": ["fin", 3, []]}, [{"rootLabel": null, "subForest": []}]],
+$       [{"MachineName": ["fin", 4, []]}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "level"},
+$        [{"rootLabel": {"Function_1D": []},
+$          "subForest": [{"rootLabel": null, "subForest": []}, {"rootLabel": null, "subForest": []}]}]],
+$       [{"Name": "load_per_period_lb"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "load_per_period_ub"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_courses"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_periods"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite"},
+$        [{"rootLabel": {"Relation_AsSet": {"Set_Explicit": []}},
+$          "subForest": [{"rootLabel": null, "subForest": []}, {"rootLabel": null, "subForest": []}]}]]],
+$  "originalDomains":
+$      [[{"Name": "n_courses"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"Name": "n_periods"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"Name": "load_per_period_lb"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"Name": "load_per_period_ub"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"Name": "courses_per_period_lb"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"Name": "courses_per_period_ub"},
+$        {"DomainInt": [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}],
+$       [{"Name": "prerequisite"},
+$        {"DomainRelation":
+$             [[], [{"SizeAttr_MaxSize": {"Reference": [{"Name": "n_courses"}, null]}}, []],
+$              [{"DomainInt":
+$                    [{"TagInt": []},
+$                     [{"RangeBounded":
+$                           [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                            {"Reference": [{"Name": "n_courses"}, null]}]}]]},
+$               {"DomainInt":
+$                    [{"TagInt": []},
+$                     [{"RangeBounded":
+$                           [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                            {"Reference": [{"Name": "n_courses"}, null]}]}]]}]]}],
+$       [{"Name": "course_load"},
+$        {"DomainFunction":
+$             [[], [{"SizeAttr_None": []}, "PartialityAttr_Total", "JectivityAttr_None"],
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Reference": [{"Name": "n_courses"}, null]}]}]]},
+$              {"DomainInt":
+$                   [{"TagInt": []}, [{"RangeLowerBounded": {"Constant": {"ConstantInt": [{"TagInt": []}, 1]}}}]]}]}],
+$       [{"Name": "level"},
+$        {"DomainFunction":
+$             [[], [{"SizeAttr_None": []}, "PartialityAttr_Total", "JectivityAttr_None"],
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Reference": [{"Name": "n_courses"}, null]}]}]]},
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Constant": {"ConstantInt": [{"TagInt": []}, 3]}}]}]]}]}],
+$       [{"Name": "curr"},
+$        {"DomainFunction":
+$             [[], [{"SizeAttr_None": []}, "PartialityAttr_Total", "JectivityAttr_None"],
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Reference": [{"Name": "n_courses"}, null]}]}]]},
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Reference": [{"Name": "n_periods"}, null]}]}]]}]}]],
+$  "trailGeneralised":
+$      [[1009423087256169180, -9069109060325258719], [6679600167311574289, -8348207164417618940],
+$       [-8481836717565848731, 1297942223753446832], [2839999393822217149, 3654290583876250384],
+$       [8971833134028116425, -1851222621063586553], [-4450102969621209571, -7036099644126171383],
+$       [-2824130028978713972, 8564967470108684994], [4044372577217243769, 2139526605357292650],
+$       [-8564304295217098175, 7162338973552593889], [9014837732463839938, -9141482804308011104],
+$       [3292861048886783288, 1472793595990962644], [-7276465544534443250, 4834150415045233857],
+$       [5142771464728479362, 6516094637292286748], [8826189383925138505, -3011823486706133670],
+$       [163697248176080485, 1837175277701482722], [5245165851192210889, 6087681379177475947],
+$       [4779078214854012457, 2635863851739600728], [3313124140306107227, 2627460327403734788],
+$       [-6747528413054805863, 575723026870956176], [-4056173489972129384, -3252408010095601996],
+$       [-3664805780785925614, 3641646955739782959], [4696089572960436663, -2412805945828650839],
+$       [-1886469126829971172, -8112450597396923468], [-1250432614269471909, -5599526867172625848],
+$       [-6571305919357440312, -8718916555779677929], [7315902330959366281, 5349182886244685830],
+$       [-3476087138347185606, -8722975960122336833], [-9001821466095311832, 7213616374504782426],
+$       [2094095136586219301, -4711621010237561803], [4892585866355752677, 5263036752936415213],
+$       [8558519753750362888, -8112450597396923468], [3141274792459174145, 6903723238031037154],
+$       [1127480678364058664, -3896145782405946335], [-4546658168358784727, -2053124996882594142],
+$       [9091314328482420788, 570523325286197721], [-2692952261436106156, 3389674182392304448],
+$       [5081579319754651590, 1013197891065215946], [-8449728808120801393, 2482065996686501661],
+$       [3969112976091725272, -7509301186850790686], [-7870413917102837819, -5711945440010179169],
+$       [-1178675521090347291, -7446113536615959558], [-6451807228623320184, 4034657697020879898],
+$       [6949439888719773406, -4215638511395008576], [2015212312499585696, 1770452400749327338],
+$       [-104373383472186225, -2190113245384119232], [-3335860211308513445, -5668020829697442118],
+$       [3614901414418879970, -7996661930928839993], [3710011733375618662, 4774196838380444054],
+$       [-5705439791600812983, 3995410894138055062], [8454423193987374149, -1533331477468616012],
+$       [5842768900449431069, 314221205714949356], [-372975813202758462, -2190113245384119232],
+$       [-6979132111686195825, -6113260944209732997], [6722221441251451057, 8421837314181585558],
+$       [-6968137191466936257, -1578757604493843259], [2093267208926378531, -239480501353709325],
+$       [3832421822904746372, -7754920238885506968], [-36312913505387440, -3700184427211778437],
+$       [7922397496275685901, 3259810062045496022], [2953333633213196126, 1146714436975318540],
+$       [3280406986240141189, -3418981681892649549], [6318893513183430351, 8061842966691408759],
+$       [-5524655584281652597, 8990711886748315637], [-4298966364939957638, 1146714436975318540],
+$       [4028868106762758383, -3418981681892649549], [1903262401494088391, 4307311412697319499],
+$       [3624513141280275430, 2762103886239410540], [6895516146317638001, -6512903566157480267],
+$       [-4114838969109410925, -6198235485108046031], [-4921021565539239979, -775445836185572887],
+$       [-904913346254109149, 4391499686426441129], [6233109739635497477, -6437064573396934543],
+$       [-7513108054276879857, -267401824316209541], [-7054977139467973086, 7694520093783479643],
+$       [-8098013912092546922, 8872440910054256437], [-2629392255120320304, 6246029443405160411],
+$       [-5008017252776036459, -8400630857051106053]]}
