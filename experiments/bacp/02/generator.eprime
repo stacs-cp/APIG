@@ -1,0 +1,608 @@
+language ESSENCE' 1.0
+
+given n_courses_min: int(1..100)
+given n_courses_max: int(1..100)
+find n_courses: int(1..100)
+given n_periods_min: int(1..100)
+given n_periods_max: int(1..100)
+find n_periods: int(1..100)
+given load_per_period_lb_min: int(1..100)
+given load_per_period_lb_max: int(1..100)
+find load_per_period_lb: int(1..100)
+given load_per_period_ub_min: int(1..100)
+given load_per_period_ub_max: int(1..100)
+find load_per_period_ub: int(1..100)
+given courses_per_period_lb_min: int(1..100)
+given courses_per_period_lb_max: int(1..100)
+find courses_per_period_lb: int(1..100)
+given courses_per_period_ub_min: int(1..100)
+given courses_per_period_ub_max: int(1..100)
+find courses_per_period_ub: int(1..100)
+given prerequisite_cardMin: int(1..100)
+given prerequisite_cardMax: int(1..100)
+given prerequisite_relation1_min: int(1..100)
+given prerequisite_relation1_max: int(1..100)
+given prerequisite_relation2_min: int(1..100)
+given prerequisite_relation2_max: int(1..100)
+find prerequisite_RelationAsMatrix: matrix indexed by [int(1..100), int(1..100)] of bool
+given course_load_range_min: int(1..100)
+given course_load_range_max: int(1..100)
+find course_load_Function1DPartial_Flags: matrix indexed by [int(1..100)] of bool
+find course_load_Function1DPartial_Values: matrix indexed by [int(1..100)] of int(1..100)
+branching on
+    [n_courses, n_periods, load_per_period_lb, load_per_period_ub, courses_per_period_lb, courses_per_period_ub,
+     prerequisite_RelationAsMatrix, course_load_Function1DPartial_Flags, course_load_Function1DPartial_Values]
+such that
+    n_courses >= n_courses_min,
+    n_courses <= n_courses_max,
+    n_periods >= n_periods_min,
+    n_periods <= n_periods_max,
+    load_per_period_lb >= load_per_period_lb_min,
+    load_per_period_lb <= load_per_period_lb_max,
+    load_per_period_ub >= load_per_period_ub_min,
+    load_per_period_ub <= load_per_period_ub_max,
+    courses_per_period_lb >= courses_per_period_lb_min,
+    courses_per_period_lb <= courses_per_period_lb_max,
+    courses_per_period_ub >= courses_per_period_ub_min,
+    courses_per_period_ub <= courses_per_period_ub_max,
+    sum([toInt(prerequisite_RelationAsMatrix[q19_1, q19_2]) | q19_1 : int(1..100), q19_2 : int(1..100)]) >=
+    prerequisite_cardMin,
+    sum([toInt(prerequisite_RelationAsMatrix[q21_1, q21_2]) | q21_1 : int(1..100), q21_2 : int(1..100)]) <=
+    prerequisite_cardMax,
+    sum([toInt(prerequisite_RelationAsMatrix[q23_1, q23_2]) | q23_1 : int(1..100), q23_2 : int(1..100)]) <= n_courses,
+    and([prerequisite_RelationAsMatrix[q8_1, q8_2] -> q8_1 >= prerequisite_relation1_min
+             | q8_1 : int(1..100), q8_2 : int(1..100)]),
+    and([prerequisite_RelationAsMatrix[q9_1, q9_2] -> q9_1 <= prerequisite_relation1_max
+             | q9_1 : int(1..100), q9_2 : int(1..100)]),
+    and([prerequisite_RelationAsMatrix[q10_1, q10_2] -> q10_1 <= n_courses | q10_1 : int(1..100), q10_2 : int(1..100)]),
+    and([prerequisite_RelationAsMatrix[q11_1, q11_2] -> q11_2 >= prerequisite_relation2_min
+             | q11_1 : int(1..100), q11_2 : int(1..100)]),
+    and([prerequisite_RelationAsMatrix[q12_1, q12_2] -> q12_2 <= prerequisite_relation2_max
+             | q12_1 : int(1..100), q12_2 : int(1..100)]),
+    and([prerequisite_RelationAsMatrix[q13_1, q13_2] -> q13_2 <= n_courses | q13_1 : int(1..100), q13_2 : int(1..100)]),
+    and([q2 >= 1 /\ q2 <= n_courses <-> course_load_Function1DPartial_Flags[q2] | q2 : int(1..100)]),
+    and([course_load_Function1DPartial_Flags[q14] -> course_load_Function1DPartial_Values[q14] >= course_load_range_min
+             | q14 : int(1..100)]),
+    and([course_load_Function1DPartial_Flags[q15] -> course_load_Function1DPartial_Values[q15] <= course_load_range_max
+             | q15 : int(1..100)]),
+    load_per_period_lb < load_per_period_ub,
+    courses_per_period_lb < courses_per_period_ub,
+    and([course <= n_courses ->
+         course_load_Function1DPartial_Values[course] <= load_per_period_ub /\
+         course_load_Function1DPartial_Flags[course]
+             | course : int(1..100)]),
+    and([course <= n_courses ->
+         sum([toInt(c <= n_courses) * catchUndef(course_load_Function1DPartial_Values[c], 0) | c : int(1..100)]) >=
+         n_periods * load_per_period_lb
+         /\ and([c <= n_courses -> course_load_Function1DPartial_Flags[c] | c : int(1..100)])
+             | course : int(1..100)]),
+    and([course <= n_courses ->
+         sum([toInt(c <= n_courses) * catchUndef(course_load_Function1DPartial_Values[c], 0) | c : int(1..100)]) <=
+         n_periods * load_per_period_ub
+         /\ and([c <= n_courses -> course_load_Function1DPartial_Flags[c] | c : int(1..100)])
+             | course : int(1..100)]),
+    n_courses >= n_periods * courses_per_period_lb,
+    n_courses <= n_periods * courses_per_period_ub,
+    sum([toInt(prerequisite_RelationAsMatrix[q17_1, q17_2]) | q17_1 : int(1..100), q17_2 : int(1..100)]) > 0,
+    and([prerequisite_RelationAsMatrix[q25_1, q25_2] -> q25_1 != q25_2 | q25_1 : int(1..100), q25_2 : int(1..100)]),
+    sum([sum([toInt(prerequisite_RelationAsMatrix[q3, q4]) | q4 : int(1..100)]) | q3 : int(1..100)]) <= 100,
+    and([course_load_Function1DPartial_Flags[q5] = false -> course_load_Function1DPartial_Values[q5] = 1
+             | q5 : int(1..100)])
+
+$ Conjure's
+$ {"finds":
+$      [{"Name": "n_courses"}, {"Name": "n_periods"}, {"Name": "load_per_period_lb"}, {"Name": "load_per_period_ub"},
+$       {"Name": "courses_per_period_lb"}, {"Name": "courses_per_period_ub"}, {"Name": "prerequisite"},
+$       {"Name": "course_load"}],
+$  "givens":
+$      [{"Name": "n_courses_min"}, {"Name": "n_courses_max"}, {"Name": "n_periods_min"}, {"Name": "n_periods_max"},
+$       {"Name": "load_per_period_lb_min"}, {"Name": "load_per_period_lb_max"}, {"Name": "load_per_period_ub_min"},
+$       {"Name": "load_per_period_ub_max"}, {"Name": "courses_per_period_lb_min"}, {"Name": "courses_per_period_lb_max"},
+$       {"Name": "courses_per_period_ub_min"}, {"Name": "courses_per_period_ub_max"}, {"Name": "prerequisite_cardMin"},
+$       {"Name": "prerequisite_cardMax"}, {"Name": "prerequisite_relation1_min"}, {"Name": "prerequisite_relation1_max"},
+$       {"Name": "prerequisite_relation2_min"}, {"Name": "prerequisite_relation2_max"}, {"Name": "course_load_range_min"},
+$       {"Name": "course_load_range_max"}],
+$  "enumGivens": [], "enumLettings": [], "lettings": [], "unnameds": [], "strategyQ": {"PickFirst": []},
+$  "strategyA": {"Compact": []},
+$  "trailCompact":
+$      [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1]],
+$  "trailVerbose": [], "trailRewrites": [], "nameGenState": [["q", 26]], "nbExtraGivens": 0,
+$  "representations":
+$      [[{"Name": "n_courses"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "n_courses_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "n_courses_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "n_periods"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "n_periods_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "n_periods_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_lb"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_ub"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_lb"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_ub"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite"},
+$        {"DomainRelation":
+$             [{"Relation_AsMatrix": []},
+$              [{"SizeAttr_MaxSize": {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}}, []],
+$              [{"DomainInt":
+$                    [{"TagInt": []},
+$                     [{"RangeBounded":
+$                           [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                            {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]},
+$               {"DomainInt":
+$                    [{"TagInt": []},
+$                     [{"RangeBounded":
+$                           [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                            {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}]]}],
+$       [{"Name": "prerequisite_cardMin"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite_cardMax"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite_relation1_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite_relation1_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite_relation2_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite_relation2_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "course_load"},
+$        {"DomainFunction":
+$             [{"Function_1DPartial": []}, [{"SizeAttr_None": []}, "PartialityAttr_Partial", "JectivityAttr_None"],
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]},
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}]}],
+$       [{"Name": "course_load_range_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "course_load_range_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}]],
+$  "representationsTree":
+$      [[{"Name": "course_load"},
+$        [{"rootLabel": {"Function_1DPartial": []},
+$          "subForest": [{"rootLabel": null, "subForest": []}, {"rootLabel": null, "subForest": []}]}]],
+$       [{"Name": "course_load_range_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "course_load_range_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "courses_per_period_lb"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "courses_per_period_lb_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "courses_per_period_lb_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "courses_per_period_ub"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "courses_per_period_ub_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "courses_per_period_ub_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "load_per_period_lb"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "load_per_period_lb_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "load_per_period_lb_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "load_per_period_ub"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "load_per_period_ub_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "load_per_period_ub_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_courses"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_courses_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_courses_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_periods"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_periods_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_periods_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite"},
+$        [{"rootLabel": {"Relation_AsMatrix": []},
+$          "subForest": [{"rootLabel": null, "subForest": []}, {"rootLabel": null, "subForest": []}]}]],
+$       [{"Name": "prerequisite_cardMax"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite_cardMin"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite_relation1_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite_relation1_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite_relation2_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite_relation2_min"}, [{"rootLabel": null, "subForest": []}]]],
+$  "originalDomains":
+$      [[{"Name": "n_courses_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "n_courses_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "n_courses"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "n_periods_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "n_periods_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "n_periods"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_lb"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "load_per_period_ub"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_lb"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "courses_per_period_ub"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite_cardMin"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite_cardMax"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite_relation1_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite_relation1_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite_relation2_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite_relation2_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "prerequisite"},
+$        {"DomainRelation":
+$             [[], [{"SizeAttr_MaxSize": {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}}, []],
+$              [{"DomainInt":
+$                    [{"TagInt": []},
+$                     [{"RangeBounded":
+$                           [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                            {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]},
+$               {"DomainInt":
+$                    [{"TagInt": []},
+$                     [{"RangeBounded":
+$                           [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                            {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}]]}],
+$       [{"Name": "course_load_range_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "course_load_range_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}],
+$       [{"Name": "course_load"},
+$        {"DomainFunction":
+$             [[], [{"SizeAttr_None": []}, "PartialityAttr_Partial", "JectivityAttr_None"],
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]},
+$              {"DomainInt":
+$                   [{"TagInt": []},
+$                    [{"RangeBounded":
+$                          [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                           {"Constant": {"ConstantInt": [{"TagInt": []}, 100]}}]}]]}]}]],
+$  "trailGeneralised":
+$      [[-2941446856823934555, -5382683503868271219], [2562970487689642485, -5040199944794248300],
+$       [-4379681883774238411, 2537812628050179317], [-2613486479803627710, -5040199944794248300],
+$       [2674715750531002882, 8194062671179995353], [-3548474746027594769, 2537812628050179317],
+$       [6533005026645125651, 7685577461859459317], [1225753019356204863, -1300784994792476266],
+$       [-2764588769495546193, 2765305804694131287], [1589505840498413515, 255619977510235508],
+$       [-3778357561015146518, -8032919391778504525], [-2861945245603241026, -8112450597396923468],
+$       [6970610091905095935, -8890021423595342818], [-4233361226753427757, 2194048596567542044],
+$       [4167765004934426992, 903803611934466833], [6288159763150170047, 206086601768498414],
+$       [3383779706254777940, -9025569953336821463], [4227552075289491580, -8899087565090982098],
+$       [4971351760814633668, 7818844323775372715], [864398707062660363, -1521040833103556589],
+$       [1785617495217129743, -8112450597396923468], [-6812849296285286954, 4097947099529990414],
+$       [7637748048868227938, 7538502435902937276], [227701279323765417, 5169834000066381773],
+$       [8021759573037860240, 1222485188524301364], [6138876188291570763, 4094601792791206073],
+$       [5002720571092724089, -3256094495976847636], [-8124452214393397841, 7818844323775372715],
+$       [-89502252559466812, -3122299075623002029], [-3237346167352006000, -8112450597396923468],
+$       [9206350117877015527, -1094581437168810130], [5404148295884877591, -4277007000993070572],
+$       [-8649741213189257642, -8223347066286118847], [5388919759776239087, 413319549510668602],
+$       [-5598387969917532286, -2865791177114577519], [-5585259910360473732, -8143215011350733878],
+$       [3752331557176054490, 7818844323775372715], [3887811747452211174, 6787420407440549055],
+$       [-33402723008428638, -7144443124189415141], [2288080552334049013, 7044676847494045406],
+$       [3916306873734757599, -529254658166399584], [2855885540967897301, -7823393503859934114],
+$       [-5743460290544407129, -5002601412131274136], [1109718698280262571, -8483075140933116620],
+$       [4537523225297909003, -637348530236262044], [-1135779448154796979, -8639582793807000269],
+$       [-8239929620882049483, -8112450597396923468], [-2914554764267631976, 3736161049801984894],
+$       [1770234530084237560, -5223095821966807516], [-8256359518890218801, -9036128771363923931],
+$       [1487819642994347142, 5249467578059127552], [-5469877630725125765, -8224947919134335503],
+$       [4190740845059648395, -5225485558661615160], [-5183575079020968501, 7818844323775372715],
+$       [-1787966196936859995, 1122904201458728579], [-1542025857115325907, 6248405690678081298],
+$       [4086623515578174005, -8427347664929142429], [-8669515419793108135, 4556725621699095524],
+$       [9201158634514412025, -7534940197915685245], [7593095027887950934, 271487778059715812],
+$       [-4406654497272220007, -3915177636804627463], [7595542896394971005, -1755766221479459655],
+$       [-5101562076108374156, -5078895192566447890], [1280150551861290765, 4143042785079531205],
+$       [6060050689908727725, 7426278466052175932], [-340114295689216351, -719651767684760147],
+$       [2090982772594603048, 7426278466052175932], [-584391360515039692, -1070380181251749439],
+$       [-3680041325364361925, -6215208695079599354], [-2072791930318165183, -4664568793820684337],
+$       [-8777079274917738551, 7983151820489521787], [-1357107054116158793, 7943971036663420360],
+$       [-2363552649984122287, 7824706348127568113], [-1475538310728205185, 7943971036663420360],
+$       [-4733845774949270197, 4913705541625119971], [-3531491199658782465, -523077173033283365],
+$       [-496264722305459239, -5450547225711041496], [5395792442431534709, 4251240481628907333],
+$       [2827189478263254705, -1987339535746455500], [6468699758256062657, -6159708706966735471],
+$       [1058282896338909796, -1987339535746455500], [-2737029448059942084, -2133746248224901339],
+$       [-2804975224611747665, -2173741260047407568], [-2588474773043830827, 8756196122443316745],
+$       [1359836403856620405, -7886530597976689523], [-6936321419322026441, -3340252153548210696],
+$       [7783432156919622725, 5094554214461853573], [-878258144380610852, 5094554214461853573],
+$       [-8206623502617449256, -4298590189399351301], [-4804276720914299201, 8587905874090839909],
+$       [3861113051351386121, -2023455115067791074], [449998773439972681, 539034082762748855],
+$       [8225216886601120629, 4707756319565032660], [-861949880513696507, 4141756059056902805],
+$       [3775715107388600033, 4141756059056902805], [-6044996532633137431, 2805724056823508501],
+$       [-5431334101517832649, 2904664896163396950], [3672467313802057541, -8353207703348100109],
+$       [3949781305155952213, 195310767969227477], [-6534651420536936793, 1937551846602231208],
+$       [4679411716236174729, -7798780184321648999], [67597117720054278, -7798780184321648999],
+$       [3088404730120184010, 1306542197759944903], [-2567271628662547233, -8931170508482776477],
+$       [4873206733913020789, 5925549265533391268], [-3578855361950048624, -8861902171742134905],
+$       [-5481955925952543939, -1637067820208211836], [-2430520200396223130, -6280315978821443861],
+$       [-3086252998069760717, -6529664522531130671], [-490593735518046787, 6420435169805938195],
+$       [170831878549634881, 6091523741425992050], [2302760446588944827, -8677092732301691444],
+$       [6552205692466605751, -3091096128851438422], [-777236786830008636, 5813351826694735188],
+$       [3303238122843188615, -8300425234516911873], [6020585441438829489, 7652892335198717680],
+$       [2555203055732906002, 865183326325188102], [3087503790519810123, -8950082835147529718],
+$       [-1774801815567235681, -2063541310989876729], [5734156615329633543, 3251568421785247637],
+$       [-5690148940950072132, 7382196547132045688], [8308260838789293728, 8319040555024142474],
+$       [-3147812850994820704, -3091096128851438422], [7808733711451681359, 5813351826694735188],
+$       [-5486192548049591688, -8300425234516911873], [-6613218363188105930, 7652892335198717680],
+$       [5840391987698146109, 865183326325188102], [-4308609527332206032, -8950082835147529718],
+$       [-5839181701324783893, -2428853064555075813], [5570426590697293169, 7422372247046191995],
+$       [-3870261078442184915, 1931761425516489028], [-3531237596874714093, 7267207113842460406],
+$       [-6967111841697862074, -1625693524092234114], [-2895259938573030965, -5068190086497892486],
+$       [-7634659130148130864, 5489687772914543337], [-7945972530061776619, 1300080183125643001],
+$       [-4759332395650956911, 933860266356484207], [4740106779091298929, 8079080792155042041],
+$       [-5556094697120753309, 6307696078612042829], [-7621048725187112734, -7719854512090320971],
+$       [722452201444706057, -1061749917037240423], [8523601235180699520, 242317929867823113],
+$       [-5668743658587053900, 7787823447496047729], [5340840011861053425, -3365662474600465263],
+$       [1263060015191830933, -3885549550073396559], [-8671897093366223639, -801008974380538823],
+$       [-2247474382592152180, 2479604965207255433], [7945574493063317126, -1754641119136148343],
+$       [-727950723231701290, -1954197100768129147], [3354092204217658999, -5040584662346959395],
+$       [-4727994818603666979, 719227711776991649], [4649537875173673257, 509359784802951601],
+$       [1897295313951459388, 1348363909238662641], [2689594143041889974, 3825819851685689393],
+$       [1051192064207801822, 6129931995241871197], [-8852923515182297601, 2373956023915898837],
+$       [4712045943379648693, 5664524604999551801], [3113951415818954204, -5711090130453795947],
+$       [-3252519754836988439, 5639218145036205917], [-101041073955643857, -4214025611205810867],
+$       [2144811875871425572, 915093063607459573], [2404009889630374785, -3078481010070949587],
+$       [2037380535361061767, -12124999795509299]]}

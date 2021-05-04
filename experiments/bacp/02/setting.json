@@ -1,0 +1,37 @@
+{
+ "generalSettings": {
+  "runDir": "/home/nttd/APIG/experiments/bacp/02",
+  "modelFile": "/home/nttd/APIG/experiments/bacp/model.essence",
+  "experimentType": "graded",
+  "evaluationSettingFile": "/home/nttd/APIG/experiments/bacp/graded.json",
+  "targetRunner": "/home/nttd/APIG/scripts/tuning-files/target-runner",
+  "scenario": "/home/nttd/APIG/scripts/tuning-files/scenario.R"
+ },
+ "tuningSettings": {
+  "maxint": 100,
+  "seed": 123,
+  "maxExperiments": 5000,
+  "scale": "linear",
+  "nCores": 1
+ },
+ "generatorSettings": {
+  "genSRTimelimit": 300,
+  "genSRFlags": "-S0",
+  "genSolverTimelimit": 300,
+  "genSolver": "minion",
+  "genSolverFlags": "-varorder domoverwdeg -valorder random -randomiseorder"
+ },
+ "conjure-version": "344170558",
+ "savilerow-version": "530991b51",
+ "minizinc-version": "",
+ "evaluationSettings": {
+  "gradedTypes": "both",
+  "nEvaluations": 3,
+  "solver": "chuffed",
+  "SRTimelimit": 30,
+  "SRFlags": "",
+  "solverMinTime": 3,
+  "solverTimelimit": 10,
+  "solverFlags": "-f"
+ }
+}
