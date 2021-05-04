@@ -70,6 +70,6 @@ such that
     and([sum([course_load(c) | c : int(1..50), c <= n_courses]) <= n_periods * load_per_period_ub | course : int(1..50), course <= n_courses])
 
 such that n_courses >= n_periods * courses_per_period_lb
-$such that n_courses <= n_periods * courses_per_period_ub
+such that n_courses <= n_periods * courses_per_period_ub
 such that |prerequisite| > 0
 such that and([a != b | (a, b) <- toSet(prerequisite)])

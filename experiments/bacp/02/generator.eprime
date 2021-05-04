@@ -82,6 +82,7 @@ such that
          /\ and([c <= n_courses -> course_load_Function1DPartial_Flags[c] | c : int(1..50)])
              | course : int(1..50)]),
     n_courses >= n_periods * courses_per_period_lb,
+    n_courses <= n_periods * courses_per_period_ub,
     sum([toInt(prerequisite_RelationAsMatrix[q17_1, q17_2]) | q17_1 : int(1..50), q17_2 : int(1..50)]) > 0,
     and([prerequisite_RelationAsMatrix[q25_1, q25_2] -> q25_1 != q25_2 | q25_1 : int(1..50), q25_2 : int(1..50)]),
     sum([sum([toInt(prerequisite_RelationAsMatrix[q3, q4]) | q4 : int(1..50)]) | q3 : int(1..50)]) <= 50,
