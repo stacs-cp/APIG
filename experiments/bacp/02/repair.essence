@@ -1,79 +1,53 @@
-language Essence 1.3
+language ESSENCE' 1.0
 
 given n_courses_min: int(1..50)
 given n_courses_max: int(1..50)
 find repaired_n_courses_min: int(1..50)
 find repaired_n_courses_max: int(1..50)
-such that repaired_n_courses_min <= repaired_n_courses_max
 given n_periods_min: int(1..50)
 given n_periods_max: int(1..50)
 find repaired_n_periods_min: int(1..50)
 find repaired_n_periods_max: int(1..50)
-such that repaired_n_periods_min <= repaired_n_periods_max
 given load_per_period_lb_min: int(1..50)
 given load_per_period_lb_max: int(1..50)
 find repaired_load_per_period_lb_min: int(1..50)
 find repaired_load_per_period_lb_max: int(1..50)
-such that repaired_load_per_period_lb_min <= repaired_load_per_period_lb_max
 given load_per_period_ub_min: int(1..50)
 given load_per_period_ub_max: int(1..50)
 find repaired_load_per_period_ub_min: int(1..50)
 find repaired_load_per_period_ub_max: int(1..50)
-such that repaired_load_per_period_ub_min <= repaired_load_per_period_ub_max
 given courses_per_period_lb_min: int(1..50)
 given courses_per_period_lb_max: int(1..50)
 find repaired_courses_per_period_lb_min: int(1..50)
 find repaired_courses_per_period_lb_max: int(1..50)
-such that repaired_courses_per_period_lb_min <= repaired_courses_per_period_lb_max
 given courses_per_period_ub_min: int(1..50)
 given courses_per_period_ub_max: int(1..50)
 find repaired_courses_per_period_ub_min: int(1..50)
 find repaired_courses_per_period_ub_max: int(1..50)
-such that repaired_courses_per_period_ub_min <= repaired_courses_per_period_ub_max
-given prerequisite_cardMin: int(0..50)
-given prerequisite_cardMax: int(0..50)
+given prerequisite_cardMin: int(1..50)
+given prerequisite_cardMax: int(1..50)
 given prerequisite_relation1_min: int(1..50)
 given prerequisite_relation1_max: int(1..50)
 given prerequisite_relation2_min: int(1..50)
 given prerequisite_relation2_max: int(1..50)
-find repaired_prerequisite_cardMin: int(0..50)
-find repaired_prerequisite_cardMax: int(0..50)
+find repaired_prerequisite_cardMin: int(1..50)
+find repaired_prerequisite_cardMax: int(1..50)
 find repaired_prerequisite_relation1_min: int(1..50)
 find repaired_prerequisite_relation1_max: int(1..50)
 find repaired_prerequisite_relation2_min: int(1..50)
 find repaired_prerequisite_relation2_max: int(1..50)
-such that
-    repaired_prerequisite_relation1_min <= repaired_prerequisite_relation1_max,
-    repaired_prerequisite_relation2_min <= repaired_prerequisite_relation2_max
 given course_load_range_min: int(1..50)
 given course_load_range_max: int(1..50)
 find repaired_course_load_range_min: int(1..50)
 find repaired_course_load_range_max: int(1..50)
-such that repaired_course_load_range_min <= repaired_course_load_range_max
-
-$ extra constraints manually added
-such that
-    $ where load_per_period_lb < load_per_period_ub
-    repaired_load_per_period_lb_max <= repaired_load_per_period_ub_min,
-
-    $where courses_per_period_lb < courses_per_period_ub
-    repaired_courses_per_period_lb_max <= repaired_courses_per_period_ub_min,
-
-    $ where forAll course: Course . (course_load(course) <= load_per_period_ub)
-    repaired_course_load_range_max <= repaired_load_per_period_ub_max,
-
-    $ |prerequisite| <= n_courses
-    repaired_prerequisite_cardMax <= repaired_n_courses_max,
-
-    $ relation cardinality constraint: |prerequisite| <= |prerequisite_relation1| * |prerequisite_relation2|
-    repaired_prerequisite_cardMin < (prerequisite_relation1_max-prerequisite_relation1_min+1)*(prerequisite_relation2_max-prerequisite_relation2_min+1),
-
-    $ where n_courses >= n_periods * courses_per_period_lb
-    repaired_n_courses_min >= repaired_n_periods_min * repaired_courses_per_period_lb_min,
-    
-    $ where n_courses <= n_periods * courses_per_period_ub
-    repaired_n_courses_max <= repaired_n_periods_max * repaired_courses_per_period_ub_max,
-
+branching on
+    [repaired_n_courses_min, repaired_n_courses_max, repaired_n_periods_min, repaired_n_periods_max,
+     repaired_load_per_period_lb_min, repaired_load_per_period_lb_max, repaired_load_per_period_ub_min,
+     repaired_load_per_period_ub_max, repaired_courses_per_period_lb_min, repaired_courses_per_period_lb_max,
+     repaired_courses_per_period_ub_min, repaired_courses_per_period_ub_max, repaired_prerequisite_cardMin,
+     repaired_prerequisite_cardMax, repaired_prerequisite_relation1_min, repaired_prerequisite_relation1_max,
+     repaired_prerequisite_relation2_min, repaired_prerequisite_relation2_max, repaired_course_load_range_min,
+     repaired_course_load_range_max]
 minimising
     sum([|repaired_n_courses_min - n_courses_min|, |repaired_n_courses_max - n_courses_max|,
          |repaired_n_periods_min - n_periods_min|, |repaired_n_periods_max - n_periods_max|,
@@ -93,3 +67,607 @@ minimising
          |repaired_course_load_range_min - course_load_range_min|,
          |repaired_course_load_range_max - course_load_range_max|;
              int(1..20)])
+such that
+    repaired_n_courses_min <= repaired_n_courses_max,
+    repaired_n_periods_min <= repaired_n_periods_max,
+    repaired_load_per_period_lb_min <= repaired_load_per_period_lb_max,
+    repaired_load_per_period_ub_min <= repaired_load_per_period_ub_max,
+    repaired_courses_per_period_lb_min <= repaired_courses_per_period_lb_max,
+    repaired_courses_per_period_ub_min <= repaired_courses_per_period_ub_max,
+    repaired_prerequisite_relation1_min <= repaired_prerequisite_relation1_max,
+    repaired_prerequisite_relation2_min <= repaired_prerequisite_relation2_max,
+    repaired_course_load_range_min <= repaired_course_load_range_max,
+    repaired_load_per_period_lb_max <= repaired_load_per_period_ub_min,
+    repaired_courses_per_period_lb_max <= repaired_courses_per_period_ub_min,
+    repaired_course_load_range_max <= repaired_load_per_period_ub_max,
+    repaired_prerequisite_cardMax <= repaired_n_courses_max,
+    repaired_prerequisite_cardMin <
+    (prerequisite_relation1_max - prerequisite_relation1_min + 1) *
+    (prerequisite_relation2_max - prerequisite_relation2_min + 1),
+    repaired_n_courses_min >= repaired_n_periods_min * repaired_courses_per_period_lb_min,
+    repaired_n_courses_max <= repaired_n_periods_max * repaired_courses_per_period_ub_max
+
+$ Conjure's
+$ {"finds":
+$      [{"Name": "repaired_n_courses_min"}, {"Name": "repaired_n_courses_max"}, {"Name": "repaired_n_periods_min"},
+$       {"Name": "repaired_n_periods_max"}, {"Name": "repaired_load_per_period_lb_min"},
+$       {"Name": "repaired_load_per_period_lb_max"}, {"Name": "repaired_load_per_period_ub_min"},
+$       {"Name": "repaired_load_per_period_ub_max"}, {"Name": "repaired_courses_per_period_lb_min"},
+$       {"Name": "repaired_courses_per_period_lb_max"}, {"Name": "repaired_courses_per_period_ub_min"},
+$       {"Name": "repaired_courses_per_period_ub_max"}, {"Name": "repaired_prerequisite_cardMin"},
+$       {"Name": "repaired_prerequisite_cardMax"}, {"Name": "repaired_prerequisite_relation1_min"},
+$       {"Name": "repaired_prerequisite_relation1_max"}, {"Name": "repaired_prerequisite_relation2_min"},
+$       {"Name": "repaired_prerequisite_relation2_max"}, {"Name": "repaired_course_load_range_min"},
+$       {"Name": "repaired_course_load_range_max"}],
+$  "givens":
+$      [{"Name": "n_courses_min"}, {"Name": "n_courses_max"}, {"Name": "n_periods_min"}, {"Name": "n_periods_max"},
+$       {"Name": "load_per_period_lb_min"}, {"Name": "load_per_period_lb_max"}, {"Name": "load_per_period_ub_min"},
+$       {"Name": "load_per_period_ub_max"}, {"Name": "courses_per_period_lb_min"}, {"Name": "courses_per_period_lb_max"},
+$       {"Name": "courses_per_period_ub_min"}, {"Name": "courses_per_period_ub_max"}, {"Name": "prerequisite_cardMin"},
+$       {"Name": "prerequisite_cardMax"}, {"Name": "prerequisite_relation1_min"}, {"Name": "prerequisite_relation1_max"},
+$       {"Name": "prerequisite_relation2_min"}, {"Name": "prerequisite_relation2_max"}, {"Name": "course_load_range_min"},
+$       {"Name": "course_load_range_max"}],
+$  "enumGivens": [], "enumLettings": [], "lettings": [], "unnameds": [], "strategyQ": {"PickFirst": []},
+$  "strategyA": {"Compact": []},
+$  "trailCompact":
+$      [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1],
+$       [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]],
+$  "trailVerbose": [], "trailRewrites": [], "nameGenState": [], "nbExtraGivens": 0,
+$  "representations":
+$      [[{"Name": "repaired_n_courses_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_n_courses_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_n_periods_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_n_periods_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_load_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_load_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_load_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_load_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_courses_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_courses_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_courses_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_courses_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_relation1_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_relation1_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_relation2_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_relation2_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_course_load_range_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_course_load_range_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_cardMax"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_cardMin"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_relation1_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_relation1_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_relation2_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_relation2_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "n_courses_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "n_courses_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "n_periods_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "n_periods_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "load_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "load_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "load_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "load_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "courses_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "courses_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "courses_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "courses_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_cardMin"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_cardMax"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "course_load_range_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "course_load_range_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}]],
+$  "representationsTree":
+$      [[{"Name": "course_load_range_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "course_load_range_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "courses_per_period_lb_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "courses_per_period_lb_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "courses_per_period_ub_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "courses_per_period_ub_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "load_per_period_lb_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "load_per_period_lb_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "load_per_period_ub_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "load_per_period_ub_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_courses_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_courses_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_periods_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "n_periods_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite_cardMax"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite_cardMin"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite_relation1_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite_relation1_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite_relation2_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "prerequisite_relation2_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_course_load_range_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_course_load_range_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_courses_per_period_lb_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_courses_per_period_lb_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_courses_per_period_ub_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_courses_per_period_ub_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_load_per_period_lb_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_load_per_period_lb_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_load_per_period_ub_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_load_per_period_ub_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_n_courses_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_n_courses_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_n_periods_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_n_periods_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_prerequisite_cardMax"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_prerequisite_cardMin"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_prerequisite_relation1_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_prerequisite_relation1_min"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_prerequisite_relation2_max"}, [{"rootLabel": null, "subForest": []}]],
+$       [{"Name": "repaired_prerequisite_relation2_min"}, [{"rootLabel": null, "subForest": []}]]],
+$  "originalDomains":
+$      [[{"Name": "n_courses_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "n_courses_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_n_courses_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_n_courses_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "n_periods_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "n_periods_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_n_periods_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_n_periods_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "load_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "load_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_load_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_load_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "load_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "load_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_load_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_load_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "courses_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "courses_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_courses_per_period_lb_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_courses_per_period_lb_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "courses_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "courses_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_courses_per_period_ub_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_courses_per_period_ub_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_cardMin"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_cardMax"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_relation1_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_relation1_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_relation2_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "prerequisite_relation2_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_cardMin"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_cardMax"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_relation1_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_relation1_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_relation2_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_prerequisite_relation2_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "course_load_range_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "course_load_range_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_course_load_range_min"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}],
+$       [{"Name": "repaired_course_load_range_max"},
+$        {"DomainInt":
+$             [{"TagInt": []},
+$              [{"RangeBounded":
+$                    [{"Constant": {"ConstantInt": [{"TagInt": []}, 1]}},
+$                     {"Constant": {"ConstantInt": [{"TagInt": []}, 50]}}]}]]}]],
+$  "trailGeneralised":
+$      [[-553546990296481481, 564893329271865276], [-4910046641848190905, -4909038018542394100],
+$       [689004169720575965, -4461246892240754038], [1242545045421672233, 6416247820559011350],
+$       [217208987029751599, 2450415122452305828], [-1555171837940525729, 5852917504586009364],
+$       [5519759501823087063, -6739845599632782212], [5965290690464428311, 3874018253758185084],
+$       [-4845151962253816841, 9033793898123998012], [-2627617312044907993, 7288232124178503276],
+$       [9176111016598124181, -8907691694147503294], [5417037082578389185, 8021245983766020334],
+$       [-8050320036022827241, 3087917654397342076], [4223870209655223511, -4877686719583143044],
+$       [7702996280066336445, -8844843936594875990], [351629127682262121, 7030556047895417110],
+$       [1759692437493721161, 6181606355376617598], [3851394260272878501, 4021065569424289210],
+$       [-6906135599816164183, -6779221163574298354], [5729309065443083381, 285497722934791610],
+$       [-7138807411366833752, -4748912666148088579], [1652671251325570674, -3128413729460514763],
+$       [3562928827570666990, 8342316042969391389], [-4760324404010895556, -818541231703475611],
+$       [-5003203619917912936, -8600109450839232947], [3185872966942829890, -4939927788652202331],
+$       [-7247958546071437957, 6897568890397390525], [-5900020033170850763, 370640131120404725],
+$       [-3373853130089021648, -1870144258201899387], [5375470666188668506, -3777021796971542467],
+$       [4733370689148287243, -4156254517243929371], [-8780457334980300939, 776600786182854941],
+$       [-8203200719771239507, 5405578230558381661], [-2350942234242833869, -4609843926715817243],
+$       [4970635595442476389, -9156622284721801267], [2349951507295110403, 3576016132003936357],
+$       [4820922291507156452, -2765488200296984115], [-9134914210334973850, -2721561142877975579],
+$       [6475744057468018899, 7038900872549188869], [7236803938828527831, -8669337943060902163],
+$       [-7517740526213183756, -4515089911169034167], [-3119997410056798257, 590397627738556933],
+$       [-2684306889022420261, 7570485352297525473], [-2458033977942891794, -462645224185532691],
+$       [2559758133461302584, 760677573106988973], [3596915155438332077, 1014160402665818465],
+$       [-1428825197408061827, -1105736605189932411], [915271363602341144, -924891351252051839],
+$       [-4873594650769572085, -2745247280184731055], [5331543889417122606, -5644407706789663491],
+$       [1822792042186293512, 777849052778852693], [-5247586107025325835, -4965015722205934935],
+$       [7202527369159754811, -7797469919986335351], [-4311252719661878298, 1902317994730389445],
+$       [-978678084179359488, 5102900607893010893], [-1315155180714825755, 4653105365721564721],
+$       [-1209298802034634422, -552362294885067039], [-3347961973894020025, -377874583251818955],
+$       [4406866274422289826, 3115213454106333185], [-4177535552267795713, 7452846568262371125]]}
