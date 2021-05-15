@@ -12,6 +12,17 @@ def run_cmd(cmd):
     return output, p.returncode
 
 
+def collect_SR_Time(resultsDir, lsInstances):
+    rs = {'instance':[], 'meanSRTime': []}
+    for inst in lsInstances:
+        outputFn = resultsDir + "/" + inst.replace('inst','out')
+        with open(outputFn, 'rt') as f:
+            lsSRTime = [float(s[:-1].split(',')[5].split('=')[1]) for s in f.readlines() if 'Run results:' in s]
+        rs['instance'].append(inst)
+        rs['meanSRTime'].append(sum(lsSRTime)/len(lsSRTime))
+    return pd.DataFrame.from_dict(rs)
+
+
 def main():
     parser = argparse.ArgumentParser(description="collect results after a tuning experiment")    
     parser.add_argument("--runDir", default='./', help='directory where the experiment was run. \nDefault: current folder')
@@ -48,7 +59,7 @@ def main():
         # get all instance with ratio>1
         t = t.astype({'ratio':'float'})
         tDis = t[t.ratio>1]
-        print("Total number of instances generated: " + str(len(t.instance)))
+        print("\nTotal number of instances generated: " + str(len(t.instance)))
         print("Total number of discriminating instances (baseSolverTime/favouredSolverTime > 1): " + str(len(tDis.instance)))
 
         # copy discriminating instances into args.copyInstancesTo
@@ -66,7 +77,7 @@ def main():
     else:
         # get all graded instances
         tGraded = t[t.status=='graded']
-        print("Total number of instances generated: " + str(len(t.instance)))
+        print("\nTotal number of instances generated: " + str(len(t.instance)))
         print("Total number of graded instances: " + str(len(tGraded.instance)))
 
         # copy discriminating instances into args.copyInstancesTo
@@ -76,7 +87,10 @@ def main():
                 os.mkdir(args.copyInstancesTo)
             print("Copy graded instances into " + args.copyInstancesTo)
             # copy graded instances to it
-            [copy(resultsDir + '/' + instance + '.param', args.copyInstancesTo) for instance in tGraded.instance]        
+            [copy(resultsDir + '/' + instance + '.param', args.copyInstancesTo) for instance in tGraded.instance]
+            # add meanSRTime into summary
+            tSRTime = collect_SR_Time(resultsDir, tGraded.instance.values)
+            tGraded = tGraded.merge(tSRTime, on='instance')
             # write out summary of those instances 
             tGraded.to_csv(args.copyInstancesTo + '/summary.csv', index=False)
 
