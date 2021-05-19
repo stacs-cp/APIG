@@ -98,7 +98,7 @@ def setup_tuning_folder(args, argGroups):
     repairModelFile = None
     if os.path.isfile(oldRepairModelFile):
         repairModelFile = args.runDir + '/repair.essence'
-        #move(essenceModelFile.replace('.essence','-instanceRepair.essence'), repairModelFile)
+        move(essenceModelFile.replace('.essence','-instanceRepair.essence'), repairModelFile)
 
     # update params.irace and generate params.irace.meta if log-scale is used, as irace doesn't support non-positive parameter lower bounds in that case
     if args.scale=='log':
