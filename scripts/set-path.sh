@@ -26,3 +26,4 @@ export PATH=$binDir/lingeling/bcj-78ebb86/:$PATH
 # irace
 export PATH=$binDir/irace/bin:$PATH
 export R_LIBS=$binDir/:$R_LIBS
+
