@@ -66,7 +66,7 @@ def get_minizinc_version():
 
 def setup_tuning_folder(args, argGroups):
     # convert all path args to absolute paths
-    for argName in ['runDir', 'modelFile', 'evaluationSettingFile', 'targetRunner']:
+    for argName in ['runDir', 'modelFile', 'evaluationSettingFile', 'targetRunner', 'scenario']:
         setattr(args, argName, os.path.abspath(getattr(args, argName)))    
 
     # create runDir
@@ -83,12 +83,22 @@ def setup_tuning_folder(args, argGroups):
     if args.maxint <= 0:
         print("ERROR: --maxint must be positive")
         sys.exit(1)
-    generatorModelFile = args.runDir + '/generator.essence'
-    cmd = 'conjure parameter-generator ' + essenceModelFile + ' --MAXINT=' + str(args.maxint) + ' --essence-out ' + generatorModelFile
+    cmd = 'conjure parameter-generator ' + essenceModelFile + ' --MAXINT=' + str(args.maxint)
     run_cmd(cmd)
 
+    # rename generator spec
+    generatorModelFile = args.runDir + '/generator.essence'
+    move(essenceModelFile.replace('.essence','-instanceGenerator.essence'), generatorModelFile)
+
     # rename irace param file
-    move(generatorModelFile + '.irace', args.runDir+'/params.irace')
+    move(essenceModelFile.replace('.essence','-instanceGenerator.essence.irace'), args.runDir+'/params.irace')
+
+    # rename repair spec
+    oldRepairModelFile = essenceModelFile.replace('.essence','-instanceRepair.essence')
+    repairModelFile = None
+    if os.path.isfile(oldRepairModelFile):
+        repairModelFile = args.runDir + '/repair.essence'
+        move(essenceModelFile.replace('.essence','-instanceRepair.essence'), repairModelFile)
 
     # update params.irace and generate params.irace.meta if log-scale is used, as irace doesn't support non-positive parameter lower bounds in that case
     if args.scale=='log':
@@ -110,22 +120,31 @@ def setup_tuning_folder(args, argGroups):
     run_cmd(cmd)
     move(args.runDir + '/model000001.eprime', args.runDir + '/generator.eprime') 
 
+    # generate repair's eprime model
+    if not (os.path.isfile(repairModelFile) is None):
+        cmd = 'conjure modelling -ac ' + repairModelFile + ' -o ' + args.runDir
+        run_cmd(cmd)        
+        move(args.runDir + '/model000001.eprime', args.runDir + '/repair.eprime') 
+
     # create detailed-output folder and copy all .eprime models file into it
     detailedOutDir = args.runDir + '/detailed-output'
     if os.path.isdir(detailedOutDir) is False:
         os.mkdir(detailedOutDir)
         copy(args.runDir + '/problem.eprime', detailedOutDir)
         copy(args.runDir + '/generator.eprime', detailedOutDir)
+        if os.path.isfile(args.runDir + '/repair.eprime'):
+            copy(args.runDir + '/repair.eprime', detailedOutDir)
     
     # copy other neccessary files
-    for fn in ['scenario.txt','instances','run.sh']:
+    for fn in ['instances','run.sh']:
         copy(get_script_path() + '/tuning-files/' + fn, args.runDir)
 
     # update fields in run.sh
     pbsFile = args.runDir + '/run.sh'
     dictValues = {'seed': args.seed, 'nCores': args.nCores, \
                     'maxExperiments': args.maxExperiments,\
-                    'targetRunner': args.targetRunner}
+                    'targetRunner': args.targetRunner,\
+                    'scenario': args.scenario}
     with open(pbsFile,'rt') as f:
         lsLines = f.readlines()
     for field, value in dictValues.items():
@@ -181,7 +200,9 @@ def main():
 
     # add fixed general settings
     setattr(args, 'targetRunner', get_script_path() + '/tuning-files/target-runner')
+    setattr(args, 'scenario', get_script_path() + '/tuning-files/scenario.R')
     argGroups['generalSettings'].append('targetRunner')
+    argGroups['generalSettings'].append('scenario')
     
     # add fixed generator settings
     setattr(args, 'genSolver','minion')

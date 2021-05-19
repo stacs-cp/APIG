@@ -444,7 +444,7 @@ def run_single_solver(instFile, seed, setting):
 
         # print out results
         localVars = locals()
-        log("\nRun results: solverType=" + solver + ', solver=' + solver + ', instance=' + instance + ', runId=' + str(i) \
+        log("\nRun results: solverType=" + solver + ', solver=' + solver + ', instance=' + instance + ', runId=' + str(i) + ', '\
                     + ', '.join([s + '=' + str(localVars[s]) for s in ['runStatus','SRTime','solverTime']])) 
          
         # make score

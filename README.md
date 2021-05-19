@@ -2,7 +2,7 @@
 
 APIG (an Automated Problem Instance Generation tool) is based on the [Essence constraint modelling toolchain](https://constraintmodelling.org/) (Essence-CP) and the automated algorithm configurator [irace](https://iridia.ulb.ac.be/irace/). Starting from an Essence specification of a combinatorial problem, the tool can generate:
 
-- *graded instances* for a single solver: valid, satisfiable and non-trivial instances
+- *graded instances* for a single solver: valid, satisfiable (optional) and non-trivial instances
 	+ valid: parameters of an instances must satisfy validity constraints. They constraints are specified in the problem Essence specification using `where` statements. 
 	+ satisfiable: optional, users can also choose to have unsat instances or both
 	+ non-trivial: solvable by the considered solver in no less than *n* seconds.
@@ -23,25 +23,22 @@ Currently the following solvers are supported:
 - cplex (MIP solver, *implemented via [MiniZinc](https://www.minizinc.org/)*)
 
 
-### Installation ###
+### Quick setup without installation ###
+
+Binaries of the main softwares used by APIG are available in the `bin` folder.
+
+To set up environment paths for those softwares, you can simply run `source <APIG_folder>/scripts/set-path`
+
+
+### Detailed installation instructions in case the quick setup described above doesn't work ###
 
 **Install irace**:
 
-Detailed instructions can be found in [irace's README](https://iridia.ulb.ac.be/irace/README.html). Below is a summary of the steps for Linux/macOS:
-- Prequisite: [R](https://www.r-project.org/)
-- Install [irace](https://iridia.ulb.ac.be/irace/) and its dependency from CRAN:
-```
-$ R
-R> install.packages(c("R6","irace"))
-```
-- Get the directory where irace was installed using the following command
-```
-Rscript -e "system.file(package='irace')"
-```
-- Add the following lines to your `~/.profile` (replace `<IRACE_DIR>` with irace's installation folder)
-```
-export PATH=<IRACE_DIR>/bin:$PATH 
-```
+The algorithm configuration tool [irace](https://iridia.ulb.ac.be/irace/README.html) is used for tuning the generator parameters. You would need to have [R](https://www.r-project.org/) installed on your computer.
+
+We use a slightly modified version of irace. The source is located in `bin/irace-source`. To install it, go to that folder and run the `install.sh` script.
+
+You would need to set up the environment paths for irace as well. See `scripts/set-path.sh` for example commands to do so.
 
 **Install MiniZinc**
 
@@ -87,10 +84,19 @@ export PATH=<CPLEX_DIR>/cplex/bin/<OS>:$PATH
 	For other arguments (e.g., numer of cores to run in parallel,  number of experiment evaluations, etc), use `python scripts/setup.py --help` for more information
 		
 - Example 1: setup an experiment with a single core and default tuning budget (5000 evaluations)
+    + for finding graded instances:
+```
+mkdir cvrp-experiment
+python scripts/setup.py --runDir cvrp-experiment --modelFile examples/essence-models/cvrp.essence --experimentType graded --evaluationSettingFile examples/evaluation-setting/graded.json
+```
+
+    + for finding discriminating instances:
+    
 ```
 mkdir cvrp-experiment
 python scripts/setup.py --runDir cvrp-experiment --modelFile examples/essence-models/cvrp.essence --experimentType discriminating --evaluationSettingFile examples/evaluation-setting/discriminating.json
 ```
+
 - Example 2: setup an experiment with 5 cores and smaller tuning budget
 ```
 mkdir cvrp-experiment
